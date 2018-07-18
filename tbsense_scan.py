@@ -19,11 +19,11 @@ def getThunderboards():
 
     return tbsense
 
-def sensorLoop(fb, tb, devId):
+def sensorLoop(tb, devId):
 
-    session = fb.getSession(devId)
-    tb.session = session
-    
+    # session = fb.getSession(devId)
+    # tb.session = session
+
     value = tb.char['power_source_type'].read()
     if ord(value) == 0x04:
         tb.coinCell = True
@@ -74,7 +74,7 @@ def sensorLoop(fb, tb, devId):
             return
 
         print(text)
-        fb.putEnvironmentData(session, data)
+#        fb.putEnvironmentData(session, data)
         sleep(1)
 
 
@@ -88,7 +88,7 @@ def dataLoop(fb, thunderboards):
 
 
 if __name__ == '__main__':
-    
+
     fb = Thundercloud()
 
     while True:
@@ -96,5 +96,6 @@ if __name__ == '__main__':
         if len(thunderboards) == 0:
             print("No Thunderboard Sense devices found!")
         else:
-            dataLoop(fb, thunderboards)
-
+            print(thunderboards)
+            for devid,tb in thunderboards.items():
+                sensorLoop(tb,devid)
