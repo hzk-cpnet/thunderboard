@@ -2,7 +2,7 @@ from bluepy.btle import *
 import struct
 from time import sleep
 from tbsense import Thunderboard
-from thundercloud import Thundercloud
+#from thundercloud import Thundercloud
 import threading
 
 def getThunderboards():
@@ -89,7 +89,7 @@ def dataLoop(fb, thunderboards):
 
 if __name__ == '__main__':
 
-    fb = Thundercloud()
+    #fb = Thundercloud()
 
     while True:
         thunderboards = getThunderboards()
@@ -98,4 +98,7 @@ if __name__ == '__main__':
         else:
             print(thunderboards)
             for devid,tb in thunderboards.items():
-                sensorLoop(tb,devid)
+#                print(dir(tb.readOrientation()))
+#                print(dir(tb.readAcceleration()))
+#               sensorLoop(tb,devid)
+                pass

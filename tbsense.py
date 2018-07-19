@@ -16,26 +16,28 @@ class Thunderboard:
       scanData = dev.getScanData()
 
       for (adtype, desc, value) in scanData:
-         if (desc == 'Complete Local Name'):
-            self.name = value
+          if (desc == 'Complete Local Name'):
+              self.name = value
 
       ble_service = Peripheral()
       ble_service.connect(dev.addr, dev.addrType)
       characteristics = ble_service.getCharacteristics()
 
       for k in characteristics:
+         print(k)
          if k.uuid == '2a6e':
             self.char['temperature'] = k
-            
+
          elif k.uuid == '2a6f':
             self.char['humidity'] = k
-            
+
          elif k.uuid == '2a76':
             self.char['uvIndex'] = k
-            
+            print(k)
+
          elif k.uuid == '2a6d':
             self.char['pressure'] = k
-            
+
          elif k.uuid == 'c8546913-bfd9-45eb-8dde-9f8754f4a32e':
             self.char['ambientLight'] = k
 
@@ -51,7 +53,22 @@ class Thunderboard:
          elif k.uuid == 'ec61a454-ed01-a5e8-b8f9-de9ec026ec51':
             self.char['power_source_type'] = k
 
-   
+         elif k.uuid == 'b7c4b694-bee3-45dd-ba9f-f3b5e994f49a':
+            self.char['orientation'] = k
+
+         elif k.uuid == 'c4c1f6e2-4be5-11e5-885d-feff819cdc9f':
+            self.char['acceleration'] = k
+
+   def readOrientation(self):
+       value = self.char['orientation'].read()
+       return value
+
+
+   def readAcceleration(self):
+       value = self.char['acceleration'].read()
+       return value
+
+
    def readTemperature(self):
       value = self.char['temperature'].read()
       value = struct.unpack('<H', value)
