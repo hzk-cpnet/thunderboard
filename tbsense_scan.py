@@ -1,8 +1,8 @@
 from bluepy.btle import *
+from bluepy import btle
 import struct
 from time import sleep
-from tbsense import Thunderboard
-#from thundercloud import Thundercloud
+from tbsense import Thunderboard, MyDelegate
 import threading
 
 def getThunderboards():
@@ -16,31 +16,30 @@ def getThunderboards():
                 if 'Thunder Sense #' in value:
                     deviceId = int(value.split('#')[-1])
                     tbsense[deviceId] = Thunderboard(dev)
-
     return tbsense
 
 def sensorLoop(tb, devId):
-
-    # session = fb.getSession(devId)
-    # tb.session = session
 
     value = tb.char['power_source_type'].read()
     if ord(value) == 0x04:
         tb.coinCell = True
 
     while True:
-
         text = ''
-
         text += '\n' + tb.name + '\n'
+        text += 'CoinCell:\t' + str(tb.coinCell) +'\n'
         data = dict()
 
         try:
 
             for key in tb.char.keys():
-                if key == 'temperature':
-                        data['temperature'] = tb.readTemperature()
-                        text += 'Temperature:\t{} C\n'.format(data['temperature'])
+                if key == 'batterylevel':
+                    data['batterylevel'] = tb.readBatteryLevel()
+                    text += 'BatteryLevel:\t{} %\n'.format(data['batterylevel'])
+
+                elif key == 'temperature':
+                    data['temperature'] = tb.readTemperature()
+                    text += 'Temperature:\t{} C\n'.format(data['temperature'])
 
                 elif key == 'humidity':
                     data['humidity'] = tb.readHumidity()
@@ -72,33 +71,26 @@ def sensorLoop(tb, devId):
 
         except:
             return
-
+        tb.enabelNotification()
         print(text)
-#        fb.putEnvironmentData(session, data)
         sleep(1)
 
-
-def dataLoop(fb, thunderboards):
-    threads = []
-    for devId, tb in thunderboards.items():
-        t = threading.Thread(target=sensorLoop, args=(fb, tb, devId))
-        threads.append(t)
-        print('Starting thread {} for {}'.format(t, devId))
-        t.start()
 
 
 if __name__ == '__main__':
 
     #fb = Thundercloud()
-
+    thunderboards = getThunderboards()
     while True:
-        thunderboards = getThunderboards()
         if len(thunderboards) == 0:
             print("No Thunderboard Sense devices found!")
+            thunderboards = getThunderboards()
         else:
-            print(thunderboards)
-            for devid,tb in thunderboards.items():
-#                print(dir(tb.readOrientation()))
-#                print(dir(tb.readAcceleration()))
-#               sensorLoop(tb,devid)
-                pass
+            try:
+                for devid,tb in thunderboards.items():
+                    sensorLoop(tb,devid)
+            except:
+                thunderboards = dict()
+                print("reconncting...")
+#                pass
+                # handleNotification() was called
