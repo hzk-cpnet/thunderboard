@@ -80,11 +80,18 @@ def sensorLoop(tb, devId):
 if __name__ == '__main__':
 
     #fb = Thundercloud()
-    thunderboards = getThunderboards()
+    try:
+        thunderboards = getThunderboards()
+    except:
+        pass
+
     while True:
         if len(thunderboards) == 0:
             print("No Thunderboard Sense devices found!")
-            thunderboards = getThunderboards()
+            try:
+                thunderboards = getThunderboards()
+            except:
+                pass
         else:
             try:
                 for devid,tb in thunderboards.items():
